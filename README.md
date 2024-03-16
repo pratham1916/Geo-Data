@@ -24,7 +24,7 @@ To get the application running on your local machine, follow these steps:
 
 1. Clone the repository to your local machine:
     ```bash
-    git clone https://github.com/yourusername/geo-data-app.git
+    git clone https://github.com/pratham1916/Geo-Data.git
     ```
 
 2. Navigate to the project directory:
