@@ -4,7 +4,8 @@ import "gorm.io/gorm"
 
 type GeoData struct {
 	gorm.Model
-	UserID    uint    `json:"userId"`
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
+	UserID   uint   `json:"user_id"`
+	FileName string `json:"file_name"`
+	FileType string `json:"file_type"`
+	FilePath string `json:"file_path"`
 }
