@@ -4,28 +4,79 @@ import (
 	"encoding/json"
 	"geo-data/models"
 	"gorm.io/gorm"
+	"io/ioutil"
 	"net/http"
 	"strings"
 )
 
+func CreateGeoData(db *gorm.DB) http.HandlerFunc {
+    return func(w http.ResponseWriter, r *http.Request) {
+        if r.Method != http.MethodPost {
+            http.Error(w, "Unsupported HTTP method", http.StatusMethodNotAllowed)
+            return
+        }
+        if err := r.ParseMultipartForm(10 << 20); err != nil {
+            http.Error(w, err.Error(), http.StatusBadRequest)
+            return
+        }
 
-func CreateOrListGeoData(db *gorm.DB) http.HandlerFunc {
+        userID := r.FormValue("user_id")
+        file, _, err := r.FormFile("file_path")
+        if err != nil {
+            http.Error(w, "File upload error: "+err.Error(), http.StatusInternalServerError)
+            return
+        }
+        defer file.Close()
+
+        fileBytes, err := ioutil.ReadAll(file)
+        if err != nil {
+            http.Error(w, "Error reading file: "+err.Error(), http.StatusInternalServerError)
+            return
+        }
+
+        var geoJSON map[string]interface{}
+        if err := json.Unmarshal(fileBytes, &geoJSON); err != nil {
+            http.Error(w, "Error parsing JSON: "+err.Error(), http.StatusInternalServerError)
+            return
+        }
+
+        geometry, err := json.Marshal(geoJSON["features"].([]interface{})[0].(map[string]interface{})["geometry"])
+        if err != nil {
+            http.Error(w, "Error processing geometry: "+err.Error(), http.StatusInternalServerError)
+            return
+        }
+
+        geoData := models.GeoData{
+            UserID:   userID,
+            Geometry: string(geometry),
+        }
+
+        if err := db.Create(&geoData).Error; err != nil {
+            http.Error(w, "Error saving geometry to database: "+err.Error(), http.StatusInternalServerError)
+            return
+        }
+
+        w.Header().Set("Content-Type", "application/json")
+        json.NewEncoder(w).Encode(map[string]interface{}{
+            "success": true,
+            "message": "Geometry saved successfully",
+            "user_id": userID,
+        })
+    }
+}
+
+func ListGeoData(db *gorm.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == http.MethodPost {
-			var geoData models.GeoData
-			if err := json.NewDecoder(r.Body).Decode(&geoData); err != nil {
-				http.Error(w, err.Error(), http.StatusBadRequest)
-				return
-			}
-			db.Create(&geoData)
-			json.NewEncoder(w).Encode(geoData)
-		} else if r.Method == http.MethodGet {
-			var geodata []models.GeoData
-			db.Find(&geodata)
-			json.NewEncoder(w).Encode(geodata)
-		} else {
+		if r.Method != http.MethodGet {
 			http.Error(w, "Unsupported HTTP method", http.StatusMethodNotAllowed)
+			return
 		}
+
+		var geodata []models.GeoData 
+		db.Find(&geodata)
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(geodata)
 	}
 }
 
