@@ -1,76 +1,70 @@
-import React, { useEffect, useState } from 'react'
-import { MapContainer, Polyline, TileLayer, Marker, Popup } from 'react-leaflet';
-import MarkerClusterGroup from 'react-leaflet-cluster';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { MapContainer, TileLayer, Polygon } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
 const MapView = () => {
-  const [initialCoordinates, setInitialCoordinates] = useState([]);
+  const [initialCoordinates, setInitialCoordinates] = useState(null);
   const [mapPoints, setMapPoints] = useState([]);
-  const [positions, setPositions] = useState([]);
+  const [myData, setMyData] = useState([]);
+  const [selectedData, setSelectedData] = useState([]);
+
+  const reverseCoordinates = (arr) => {
+    return [arr[1], arr[0]];
+  };
 
   useEffect(() => {
-    const coordinates =[
-      [
-        [
-          78.8045938515902,
-          21.384452367356985
-        ],
-        [
-          78.8045938515902,
-          21.014236297073978
-        ],
-        [
-          79.37816644715724,
-          21.014236297073978
-        ],
-        [
-          79.37816644715724,
-          21.384452367356985
-        ],
-        [
-          78.8045938515902,
-          21.384452367356985
-        ]
-      ]
-    ]
+    const selectedCoordinates = myData[selectedData];
+    if (selectedCoordinates) {
+      const first = reverseCoordinates(selectedCoordinates[0]);
+      const map = selectedCoordinates.map((e) => {
+        return { location: reverseCoordinates(e) };
+      });
 
-    const co = coordinates[0]
-    const first = reversArray(co[0]);
-    const map = co.map((e,i)=>{
-        return {location:reversArray(e)}
-    })
-    console.log(first,map);
+      setInitialCoordinates(first);
+      setMapPoints(map.map(mp => mp.location)); 
+    }
+  }, [selectedData, myData]);
 
-    setInitialCoordinates(first)
-    setMapPoints(map)
-    const linePositions = [];
-        for (let i = 0; i < mapPoints.length - 1; i++) {
-            linePositions.push([mapPoints[i].location, mapPoints[i + 1].location]);
-        }
-        setPositions(linePositions);
-  }, [])
+  useEffect(() => {
+    const fetchCoordinates = async () => {
+      try {
+        const response = await axios.get('http://localhost:8080/geodata/list');
+        const userid = localStorage.getItem("userId");
+        const data = response.data
+          .filter((e) => e.user_id === userid)
+          .map((e) => JSON.parse(e.geometry).coordinates[0]);
 
-  const reversArray = (val) =>{
-    const f = [val[1],val[0]]
-    return f;
-  }
-  
+        setMyData(data);
+      } catch (error) {
+        console.error('Failed to fetch coordinates:', error);
+      }
+    };
+
+    fetchCoordinates();
+  }, []);
 
   return (
-    <div>
-    
-  {initialCoordinates.length >0 && <MapContainer zoom={8} style={{margin:"auto",marginTop:"100px", height: '500px', width: '90%', borderRadius: '10px', }} center={initialCoordinates}>
-    <TileLayer url="http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}" maxZoom={20} subdomains={['mt0', 'mt1', 'mt2', 'mt3']} />
-    {positions.length > 0 && positions.map((position, index) => <Polyline key={index} positions={position} color={"white"} />)}
-    <MarkerClusterGroup chunkedLoading>
-      {mapPoints.map((e, i) => (
-        <Marker key={i} position={e.location}/>
-      ))}
-    </MarkerClusterGroup>
-  </MapContainer>}
-  </div>
-  )
-}
+    <div style={{ marginTop: "100px", textAlign:"center" }}>
+      <select onChange={(e) => setSelectedData(e.target.value)}>
+        <option value="">Select a point</option>
+        {myData.map((_, i) => (
+          <option key={i} value={i}>{i + 1}</option>
+        ))}
+      </select>
 
-export default MapView
+      <div style={{ width: "90%", height: "500px",margin:"20px auto" }}>
+        {initialCoordinates && (
+          <MapContainer center={initialCoordinates} zoom={7} style={{ height: '500px', width: '100%', borderRadius: '10px' }}>
+            <TileLayer url="http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" />
+            {mapPoints.length > 0 && (
+              <Polygon positions={mapPoints} />
+            )}
+          </MapContainer>
+        )}
+      </div>
+    </div>
+  );
+};
 
+export default MapView;

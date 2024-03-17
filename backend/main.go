@@ -32,7 +32,7 @@ func main() {
 	http.HandleFunc("/login", corsMiddleware(routes.Login))
 	http.HandleFunc("/geodata", corsMiddleware(routes.CreateGeoData(db)))
 	http.HandleFunc("/geodata/list", corsMiddleware(routes.ListGeoData(db)))
-	http.HandleFunc("/geodata/", corsMiddleware(routes.RetrieveUpdateOrDeleteGeoData(db)))
+	http.HandleFunc("/geodata/user", corsMiddleware(routes.GetGeoDataByUser(db)))
 	fmt.Println("Server starting on port 8080...")
 	http.ListenAndServe(":8080", nil)
 }

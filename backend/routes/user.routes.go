@@ -71,5 +71,5 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"message": "Login Successful", "token": token})
+	json.NewEncoder(w).Encode(map[string]interface{}{"message": "Login Successful", "token": token,"userId":  user.ID})
 }

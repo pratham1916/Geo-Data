@@ -1,8 +1,13 @@
+body{
+    background-color: black;
+    color: #fff
+}
 .container {
     border: 1px solid rgb(108, 108, 108);
     width: 70%;
     margin: 100px auto 0;
     display: flex;
+    background-color: black;
 }
 
 .container .left-container img {
@@ -23,7 +28,6 @@
 }
 
 form input {
-    color: white;
     margin-top: 20px;
     width: 100%;
     border-radius: 5px;
