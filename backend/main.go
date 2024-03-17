@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"geo-data/config"
 	"geo-data/routes"
+	"log"
 	"net/http"
+	"github.com/joho/godotenv"
 )
 
 func corsMiddleware(next http.HandlerFunc) http.HandlerFunc {
@@ -23,6 +25,12 @@ func corsMiddleware(next http.HandlerFunc) http.HandlerFunc {
 }
 
 func main() {
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	db, err := config.ConnectDB()
 	if err != nil {
 		fmt.Println("Error connecting to the database: ", err)
