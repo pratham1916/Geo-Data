@@ -10,6 +10,10 @@ Welcome to the Geo-Data App repository! Our application offers a comprehensive s
 - **Custom Shapes:** Draw, save, and edit custom shapes directly on the map for personalized geospatial data management.
 - **Responsive Design:** A user-friendly interface that adapts to various devices, ensuring a seamless experience for all users.
 
+
+## How to Install and Run My Project Local System!
+[![Watch the Demo Video]](https://drive.google.com/file/d/14HU_bHxY2TJg1XY_ZKLAnNbOw73HLrde/view?usp=sharing)
+
 ## Project Preview
 ![Page Preview 1](/Preview/preview-1.png)
 ![Page Preview 2](/Preview/preview-2.png)
