@@ -39,27 +39,20 @@ To get the application running on your local machine, follow these steps:
     cd geo-data
     ```
 
-3. Install frontend dependencies:
+3. Install frontend dependencies and run locally:
     ```bash
     cd frontend
     npm install
     npm run dev
     ```
 
-4. Install backend dependencies:
+4. Install backend dependencies and run locally:
     ```bash
     cd ../backend
-    go get .
-    ```
-
-5. Create a `.env` file in the backend directory and configure your database settings and other environment variables as needed.
-
-6. Run the backend server:
-    ```bash
     go run main.go
     ```
 
-Your Geo-Data App should now be accessible at `http://localhost:3000`.
+5. Create a `.env` file in the backend directory and configure your database settings and other environment variables as needed.
 
 ## Technologies
 
