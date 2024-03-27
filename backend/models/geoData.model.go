@@ -8,4 +8,5 @@ type GeoData struct {
 	FilePath string `json:"file_path"`
 	Geometry string `json:"geometry"`
 	Title    string `json:"title"`
+	Shapes 	 string `json:"shapes"`
 }

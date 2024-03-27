@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"geo-data/config"
 	"geo-data/routes"
+	"github.com/joho/godotenv"
 	"log"
 	"net/http"
-	"github.com/joho/godotenv"
 )
 
 func corsMiddleware(next http.HandlerFunc) http.HandlerFunc {
@@ -41,6 +41,9 @@ func main() {
 	http.HandleFunc("/geodata", corsMiddleware(routes.CreateGeoData(db)))
 	http.HandleFunc("/geodata/list", corsMiddleware(routes.ListGeoData(db)))
 	http.HandleFunc("/geodata/user", corsMiddleware(routes.GetGeoDataByUser(db)))
+	http.HandleFunc("/shape", corsMiddleware(routes.CreateShape(db)))
+	http.HandleFunc("/shape/update", corsMiddleware(routes.UpdateShape(db)))
+	http.HandleFunc("/shape/delete", corsMiddleware(routes.DeleteShape(db)))
 	fmt.Println("Server starting on port 8080...")
 	http.ListenAndServe(":8080", nil)
 }
